@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# NEVER DIE
-set +e
-while [ "1" -eq "1" ]; do
-    # -u unbuffered output for immediate reading of log files
-    sudo python -u /plant/SeniorDesign/python/serial_read.py >>/plant/logs/serialreadout.txt 2>>/plant/logs/serialreaderror.txt || true
-	sleep 1
-done
