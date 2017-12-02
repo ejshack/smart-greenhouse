@@ -3,12 +3,14 @@
 #include <Wire.h>
 #include <Adafruit_ADS1015.h>
 #include "Adafruit_SHT31.h"
+#include <Adafruit_PWMServoDriver.h>
 
 #define I2C_MUX_1 0x70
 #define I2C_MUX_2 0x71
 
 Adafruit_ADS1015 ads;
 Adafruit_SHT31 sht31 = Adafruit_SHT31();
+Adafruit_PWMServoDriver pwm1 = Adafruit_PWMServoDriver(0x40);
 const float VRefer = 4.096 * 2;
 
 void setup(void)
@@ -24,7 +26,8 @@ void setup(void)
 
 
 
-
+  pwm1.begin();
+  pwm1.setPWMFreq(1600);
   //Check for SHT31 and ADS1015 on all chambers
   for (int i = 0; i < 16; i++) {
     chamberSelect(i);
@@ -129,6 +132,11 @@ void loop(void)
     Serial.println("Failed to read humidity");
   }
   Serial.println();
+  for (uint16_t i=0; i<4096; i += 500) {
+    for (uint8_t pwmnum=0; pwmnum < 16; pwmnum++) {
+      pwm1.setPWM(pwmnum, 0, (i + (4096/16)*pwmnum) % 4096 );
+    }
+  }
 
   delay(1000);
 }
