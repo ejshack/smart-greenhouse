@@ -101,6 +101,10 @@ float readCO2Concentration() {
   return Concentration;
 }
 
+float setTemperature(float temperature){
+  //develop equation for temperature control system with feedback here
+}
+
 void loop(void)
 {
   int16_t adc0, adc1, adc2, adc3;
