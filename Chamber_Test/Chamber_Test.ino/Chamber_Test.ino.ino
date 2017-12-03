@@ -10,7 +10,8 @@
 
 Adafruit_ADS1015 ads;
 Adafruit_SHT31 sht31 = Adafruit_SHT31();
-Adafruit_PWMServoDriver pwm1 = Adafruit_PWMServoDriver(0x40);
+Adafruit_PWMServoDriver pwm1 = Adafruit_PWMServoDriver(0x41); //TECs
+Adafruit_PWMServoDriver pwm2 = Adafruit_PWMServoDriver(0x42); //Small fan
 const float VRefer = 4.096 * 2;
 
 void setup(void)
@@ -22,22 +23,32 @@ void setup(void)
   delay(200);
   Serial.println("Winding panendermic semi-boloid slots...");
   delay(200);
-  Serial.println("Control Box initialized.");
+
 
 
 
   pwm1.begin();
-  pwm1.setPWMFreq(1600);
+  pwm1.setPWMFreq(1000);
+  pwm2.begin();
+  pwm2.setPWMFreq(1000);
   //Check for SHT31 and ADS1015 on all chambers
-  for (int i = 0; i < 16; i++) {
-    chamberSelect(i);
+  //for (int i = 0; i < 16; i++) {
+    //chamberSelect(i);
     ads.setGain(GAIN_ONE);        // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
     ads.begin();
     if (! sht31.begin(0x44)) {
       Serial.print("Couldn't find SHT31 for chamber #");
-      Serial.println(i);
+      //Serial.println(i);
     }
-  }
+  //}
+/*  
+  for (uint8_t pwmnum=0; pwmnum < 16; pwmnum++) {
+        pwm1.setPWM(pwmnum, 0, 1024);
+        pwm2.setPWM(pwmnum, 0, 4095);
+    }
+*/
+    pwm1.setPWM(0, 0, 1024);
+    Serial.println("Control Box initialized.");
 }
 
 /*Function to select which chamber's I2C to communicate with*/
@@ -136,11 +147,11 @@ void loop(void)
     Serial.println("Failed to read humidity");
   }
   Serial.println();
-  for (uint16_t i=0; i<4096; i += 500) {
-    for (uint8_t pwmnum=0; pwmnum < 16; pwmnum++) {
-      pwm1.setPWM(pwmnum, 0, (i + (4096/16)*pwmnum) % 4096 );
-    }
-  }
 
-  delay(1000);
+  Serial.println("Turning on the small fan....");
+  pwm2.setPWM(0, 0, 4095);
+  delay(5000);
+  Serial.println("Turning off the small fan....");
+  pwm2.setPWM(0, 0, 0);
+  delay(5000);
 }
