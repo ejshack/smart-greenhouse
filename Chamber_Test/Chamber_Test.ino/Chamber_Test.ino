@@ -10,9 +10,12 @@
 
 Adafruit_ADS1015 ads;
 Adafruit_SHT31 sht31 = Adafruit_SHT31();
-Adafruit_PWMServoDriver pwm1 = Adafruit_PWMServoDriver(0x41); //TECs
-Adafruit_PWMServoDriver pwm2 = Adafruit_PWMServoDriver(0x42); //Small fan
+Adafruit_PWMServoDriver smallFanPWM = Adafruit_PWMServoDriver(0x42);        //pin 3
+Adafruit_PWMServoDriver TEC_Direction_PWM = Adafruit_PWMServoDriver(0x41);  //pin 11 
+Adafruit_PWMServoDriver TEC_Magnitude_PWM = Adafruit_PWMServoDriver(0x40);  //pin 7
 const float VRefer = 4.096 * 2;
+bool isFanOn = false;
+bool isHeating = true;
 
 void setup(void)
 {
@@ -23,32 +26,27 @@ void setup(void)
   delay(200);
   Serial.println("Winding panendermic semi-boloid slots...");
   delay(200);
+  Serial.println("Control Box initialized.");
+  Wire.begin();
 
 
-
-
-  pwm1.begin();
-  pwm1.setPWMFreq(1000);
-  pwm2.begin();
-  pwm2.setPWMFreq(1000);
+  ads.setGain(GAIN_ONE);        // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
+  ads.begin();
+  smallFanPWM.begin();
+  smallFanPWM.setPWMFreq(1600);
+  TEC_Direction_PWM.begin();
+  TEC_Direction_PWM.setPWMFreq(1600);
+  TEC_Magnitude_PWM.begin();
+  TEC_Magnitude_PWM.setPWMFreq(1600);
   //Check for SHT31 and ADS1015 on all chambers
-  //for (int i = 0; i < 16; i++) {
-    //chamberSelect(i);
-    ads.setGain(GAIN_ONE);        // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
-    ads.begin();
+  for (int i = 0; i < 16; i++) {
+    chamberSelect(i);
+
     if (! sht31.begin(0x44)) {
       Serial.print("Couldn't find SHT31 for chamber #");
-      //Serial.println(i);
+      Serial.println(i);
     }
-  //}
-/*  
-  for (uint8_t pwmnum=0; pwmnum < 16; pwmnum++) {
-        pwm1.setPWM(pwmnum, 0, 1024);
-        pwm2.setPWM(pwmnum, 0, 4095);
-    }
-*/
-    pwm1.setPWM(0, 0, 1024);
-    Serial.println("Control Box initialized.");
+  }
 }
 
 /*Function to select which chamber's I2C to communicate with*/
@@ -112,31 +110,60 @@ float readCO2Concentration() {
   return Concentration;
 }
 
-float setTemperature(float temperature){
-  //develop equation for temperature control system with feedback here
+void setTemperature(float targetTemperature, bool isHeating){
+  if(isHeating){
+     //direction pin is high (heating)
+    TEC_Direction_PWM.setPWM(0, 0, 4095);
+    isHeating = true;
+  }
+  else{
+    //direction pin is low (cooling)
+    TEC_Direction_PWM.setPWM(0, 0, 0);
+    isHeating = false;
+  }
+   /*
+    * set magnitude as a function of the difference between the target
+   * themperature and the chamber themperature
+   */
+   //magnitude pwm is 12.5% dutycycle
+  TEC_Magnitude_PWM.setPWM(0, 0, 2047);
+}
+
+bool toggleVentilationFan(){
+
+  if(isFanOn){
+    smallFanPWM.setPWM(0, 0, 0);
+    isFanOn = false;
+  }
+  else{
+    smallFanPWM.setPWM(0, 0, 4095);
+    isFanOn = true;
+  }
+  return isFanOn;
 }
 
 void loop(void)
 {
-  int16_t adc0, adc1, adc2, adc3;
+//  int16_t adc0, adc1, adc2, adc3;
   float t = sht31.readTemperature();
   float h = sht31.readHumidity();
-
+  
   Serial.println("===================================");
   /////////////////ADC/////////////////////
-  adc0 = ads.readADC_SingleEnded(0);
-  adc1 = ads.readADC_SingleEnded(1);
-  adc2 = ads.readADC_SingleEnded(2);
-  adc3 = ads.readADC_SingleEnded(3);
-  Serial.print("O2 Concentration: "); Serial.println(readO2Concentration());
-  Serial.print("CO2 Concentration: "); Serial.println(readCO2Concentration());
-  Serial.print("AIN2: "); Serial.println(adc2);
-  Serial.print("AIN3: "); Serial.println(adc3);
-  Serial.println(" ");
-
+//  adc0 = ads.readADC_SingleEnded(0);
+//  adc1 = ads.readADC_SingleEnded(1);
+//  adc2 = ads.readADC_SingleEnded(2);
+//  adc3 = ads.readADC_SingleEnded(3);
+  Serial.print("O2 Concentration: "); Serial.print(readO2Concentration()); Serial.println(" %");
+  Serial.print("CO2 Concentration: "); Serial.print(readCO2Concentration()); Serial.println(" ppm");
+//  Serial.print("AIN2: "); Serial.println(adc2);
+//  Serial.print("AIN3: "); Serial.println(adc3);
+//  Serial.println(" ");
+//
   ///////////SHT31-D///////////////
   if (! isnan(t)) {  // check if 'is not a number'
     Serial.print("Temp *C = "); Serial.println(t);
+    Serial.print("Temp *F = "); Serial.println((t*(1.8)+32));
   } else {
     Serial.println("Failed to read temperature");
   }
@@ -147,11 +174,15 @@ void loop(void)
     Serial.println("Failed to read humidity");
   }
   Serial.println();
+//  for (uint16_t i=0; i<4096; i += 500) {
+//    for (uint8_t pwmnum=0; pwmnum < 16; pwmnum++) {
+//      pwm1.setPWM(pwmnum, 0, (i + (4096/16)*pwmnum) % 4096 );
+//    }
+//  }
+  Serial.println("Chamber is heating to 82.3 F");
+  setTemperature(82.3, true);
+  Serial.println("Toggling Fan...");
+  toggleVentilationFan();
 
-  Serial.println("Turning on the small fan....");
-  pwm2.setPWM(0, 0, 4095);
-  delay(5000);
-  Serial.println("Turning off the small fan....");
-  pwm2.setPWM(0, 0, 0);
-  delay(5000);
+  delay(2000);
 }

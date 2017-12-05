@@ -141,8 +141,11 @@ void readChamber(int chamberNum){
 
 void loop(void) 
 {
-  for(int i=0;i<15;i++){
+  for(int i=0;i<7;i++){
     readChamber(i);
+    if(i==7){
+      Serial.println("==========================");
+    }
   }
   delay(1000);
 }
