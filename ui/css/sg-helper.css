@@ -1,0 +1,89 @@
+/* css for sg-helper plugin */
+
+.sg-button {
+	display: inline-block;
+	border-radius: 5px 20px;
+  width: 50px;
+  height: 40px;
+	margin: 7px;
+}
+
+#sg-chamber-buttons {
+	display: flex;
+	justify-content: space-around;
+}
+
+/*#sg-chamber-button,
+#sg-history-button {*/
+#reload-chambers {
+	width: 100%;
+	border-radius: 5px 20px;
+	height: 40px;
+}
+
+#add-chamber,
+#cancel-add-chamber,
+#deactivate-chamber,
+#sg-update-details {
+	display: inline-block;
+	border-radius: 5px 20px;
+	height: 40px;
+	margin: 7px;
+}
+
+.sg-buttons {
+	width: 20%;
+	margin: 15px;
+}
+
+#sg-notactive,
+#sg-chamberinfo,
+#sg-dashboard-div {
+	display: none;
+}
+
+.sg-label {
+	font-weight: bold;
+	color: white;
+	margin: 20px;
+}
+
+#sg-form-header {
+	margin-bottom: 20px;
+}
+
+.sg-text {
+	color: white;
+	margin-bottom: 15px;
+}
+
+.sg-textarea {
+	width: 40%;
+	height: 100px;
+	margin: 15px;
+}
+
+#add-title {
+	width: 35%;
+}
+
+/*#add-interval {
+
+}*/
+
+#add-interval-type {
+	background-color: white;
+	margin-left: 10px;
+}
+
+.sg-inline {
+	display: inline;
+}
+
+.sg-chart-control {
+	height: 40px;
+}
+
+.sg-chart-header {
+	color: white;
+}

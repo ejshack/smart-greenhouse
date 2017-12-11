@@ -1,0 +1,59 @@
+<!-- Chamber Buttons Div -->
+<div id="sg-chamber-buttons">
+  <!--
+  <button id="sg-chamber-button">Active Chambers</button><button id="sg-history-button">Chamber History</button>
+  -->
+  <button id="reload-chambers">Reload Chambers</button>
+</div>
+
+<!-- Chamber Table Div -->
+<br class=""><hr><br class="">
+<div id="chamber-table"></div>
+
+<!-- Inactive Chamber Div -->
+<div id="sg-notactive">
+  <br class=""><hr><br class="">
+  <h2 id="sg-form-header" class="sg-inline sg-text">Chamber&#160;</h4><h2 id="add-number" class="sg-inline sg-text"></h4>
+  <p class="sg-text">This chamber is not active. Enter the chamber title, type and details.<br class=""> Press the Add Chamber button to initiate the chamber.</p>
+  <label class="sg-label" for="add-title">Title&#160;</label><input type="text" id="add-title">
+  <label class="sg-label" for="add-cooling">Cooling Chamber</label><input type="radio" id="add-cooling" name="sg-add-type" value="C" checked><label class="sg-label" for="add-heating">&#160;&#160;&#160;Heating Chamber</label><input type="radio" id="add-heating" name="sg-add-type" value="H">
+  <label class="sg-label" for="add-interval">Interval&#160;</label><input id="add-interval" type="number" value="5" min="1" max="60" step="1"><select id="add-interval-type"><option value="seconds" selected>Seconds</option><option value="minutes">Minutes</option><option value="hours">Hours</option></select>
+  <label class="sg-label" for="add-details">Details</label>
+  <textarea id="add-details" class="sg-textarea">Details and notes about the chamber.</textarea>
+  <input type="button" id="cancel-add-chamber" class="sg-buttons" value="Cancel"><input type="button" id="add-chamber" class="sg-buttons" value="Add Chamber">
+</div>
+
+  <!-- General Chamber Info Div -->
+<div id="sg-chamberinfo">
+  <br class=""><hr><br class="">
+  <h2 class="sg-inline sg-chart-header">&#9788;&#160;</h2><h2 id="chamber-number" class="sg-inline sg-chart-header"></h2><h2 class="sg-inline sg-chart-header">&#160;&#160;&#9832;&#160;&#160;</h2><h4 id="chamber-title" class="sg-text sg-inline"></h4>
+  <label id="chamber-type" class="sg-label"></label>
+  <label class="sg-label" for="sg-update-details-text">Details</label>
+  <textarea id="sg-update-details-text" class="sg-textarea"></textarea>
+  <input type="button" id="sg-update-details" value="Update Details"><input type="button" id="deactivate-chamber" value="Deactivate Chamber">
+</div>
+
+<!--Charts Dashboard-->
+<div id="sg-dashboard-div">
+  <br class=""><hr><br class="">
+  <!-- O2 chart and control -->
+  <h2 class="sg-chart-header">&#167;&#160;Oxygen Sensor Data</h2>
+  <div id="sg-o2-chart"></div>
+  <div id="sg-o2-control" class="sg-chart-control"></div>
+  <br class=""><hr><br class="">
+  <!-- CO2 chart and control -->
+  <h2 class="sg-chart-header">&#167;&#160;Carbon Dioxide Sensor Data</h2>
+  <div id="sg-co2-chart"></div>
+  <div id="sg-co2-control" class="sg-chart-control"></div>
+  <br class=""><hr><br class="">
+  <!-- Temp chart and control -->
+  <h2 class="sg-chart-header">&#167;&#160;Temperature Sensor Data</h2>
+  <div id="sg-temp-chart"></div>
+  <div id="sg-temp-control" class="sg-chart-control"></div>
+  <br class=""><hr><br class="">
+  <!-- Humidity chart and control -->
+  <h2 class="sg-chart-header">&#167;&#160;Humidity Sensor Data</h2>
+  <div id="sg-humidity-chart"></div>
+  <div id="sg-humidity-control" class="sg-chart-control"></div>
+  <br class=""><hr><br class="">
+</div>
